@@ -1,83 +1,59 @@
-import requests
 import spotipy
 import spotipy.util as util
 import sys
-import tidalapi
 import config
 
 
-def spotify_connect(username, client_id, client_secret, redirect_uri):
-    """Connect to spotify and return a session object.
+class Spotify2tidal:
+    def __init__(
+        self,
+        spotify_username,
+        spotify_client_id,
+        spotify_client_secret,
+        spotify_redirect_uri,
+        tidal_username,
+        tidal_password,
+    ):
+        self.spotify_username = spotify_username
+        self.spotify_session = self.spotify_connect(
+            spotify_username,
+            spotify_client_it,
+            spotify_client_secret,
+            spotify_redirect_uri,
+        )
+        self.tidal_session = self.tidal_connect(tidal_username, tidal_password)
 
-    Use spotify's Authorization Code Flow.
-    This requires a registered client at spotify with a valid client-id,
-    client-secret and some redirection-url
-    More information on authorization:
-    https://developer.spotify.com/documentation/general/guides/authorization-guide/
-    https://spotipy.readthedocs.io/en/latest/#authorized-requests
+    def spotify_connect(
+        self, username, client_id, client_secret, redirect_uri
+    ):
+        """Connect to spotify and return a session object.
 
-    Keyword arguments:
-    username: Spotify username
-    """
-    scope = "user-library-read playlist-read-private playlist-modify-private playlist-modify-public"
-    token = util.prompt_for_user_token(
-        username,
-        scope=scope,
-        client_id=client_id,
-        client_secret=client_secret,
-        redirect_uri=redirect_uri,
-    )
+        Use spotify's Authorization Code Flow.
+        This requires a registered client at spotify with a valid client-id,
+        client-secret and some redirection-url
+        More information on authorization:
+        https://developer.spotify.com/documentation/general/guides/authorization-guide/
+        https://spotipy.readthedocs.io/en/latest/#authorized-requests
 
-    if token:
-        sp = spotipy.Spotify(auth=token)
-    else:
-        print("Error login into spotify")
-        sys.exit()
+        Keyword arguments:
+        username: Spotify username
+        """
+        scope = "user-library-read playlist-read-private playlist-modify-private playlist-modify-public"
+        token = util.prompt_for_user_token(
+            username,
+            scope=scope,
+            client_id=client_id,
+            client_secret=client_secret,
+            redirect_uri=redirect_uri,
+        )
 
-    return sp
+        if token:
+            sp = spotipy.Spotify(auth=token)
+        else:
+            print("Error login into spotify")
+            sys.exit()
 
-
-def tidal_connect(username, password):
-    """Connect to tidal and return a session object.
-
-    Keyword arguments:
-    username: Tidal username
-    password: Tidal password
-    """
-    tidal_session = tidalapi.Session()
-    try:
-        tidal_session.login(username, password)
-    except requests.exceptions.HTTPError:
-        print("Error login into tidal")
-        sys.exit()
-    return tidal_session
-
-
-def _tidal_delete_existing_playlist(tidal_session, playlist_name):
-    """Delete any existing playlist with a given name.
-
-    Keyword arguments:
-    tidal_session: Session object of the tidalapi
-    playlist_name: Playlist name to delete
-    """
-    for playlist in tidal_session.get_user_playlists(tidal_session.user.id):
-        if playlist.name == playlist_name:
-            _tidal_delete_playlist(tidal_session, playlist.id)
-
-
-def _tidal_delete_playlist(tidal_session, playlist_id):
-    """Delete a playlist.
-
-    Keyword arguments:
-    tidal_session: Session object of the tidalapi
-    playlist_id: Playlist ID to delete
-    """
-    playlist_url = "https://listen.tidal.com/v1/playlists/" + playlist_id
-
-    r = requests.delete(
-        playlist_url, headers={"x-tidal-sessionid": tidal_session.session_id}
-    )
-    r.raise_for_status()
+        return sp
 
 
 def tidal_create_all_spotify_playlists(tidal_session, spotify_session):
@@ -170,73 +146,7 @@ def _tidal_add_spotify_playlist(
         )
 
 
-def _tidal_add_track_to_playlist(tidal_session, playlist_id, name, artist):
-    """Search tidal for a track and add it to a playlist.
 
-    Keyword arguments:
-    tidal_session: Session object of the tidalapi
-    playlist_id: Playlist to add track to
-    name: Name of the track
-    artist: Artist of the track
-    """
-    tidal_track_id = _tidal_search_track(tidal_session, name, artist)
-
-    if tidal_track_id:
-        tidal_add_track_url = (
-            "https://listen.tidal.com/v1/playlists/"
-            + str(playlist_id)
-            + "/items"
-        )
-        r = requests.post(
-            tidal_add_track_url,
-            headers={
-                "x-tidal-sessionid": tidal_session.session_id,
-                "if-none-match": "*",
-            },
-            data={"trackIds": tidal_track_id, "toIndex": 1},
-        )
-        # r.raise_for_status()
-
-    else:
-        print("Could not find on tidal: " + artist + " - " + name)
-
-
-def _tidal_search_track(tidal_session, name, artist):
-    """Search tidal and return the track ID.
-
-    Keyword arguments:
-    tidal_session: Session object of the tidalapi
-    name: Name of the track
-    artist: Artist of the track
-    """
-    tracks = tidal_session.search(field="track", value=name).tracks
-
-    for t in tracks:
-        if t.artist.name.lower() == artist.lower():
-            return t.id
-
-
-def _tidal_create_playlist(tidal_session, playlist_name):
-    """Create a tidal playlist and return its ID.
-
-    Keyword arguments:
-    playlist_name: Name of the playlist to create
-    """
-    tidal_create_playlist_url = (
-        # "https://listen.tidal.com/v1/users/" + str(tidal_id) + "/playlists"
-        "https://listen.tidal.com/v1/users/"
-        + str(tidal_session.user.id)
-        + "/playlists"
-    )
-
-    r = requests.post(
-        tidal_create_playlist_url,
-        data={"title": playlist_name, "description": ""},
-        headers={"x-tidal-sessionid": tidal_session.session_id},
-    )
-    # r.raise_for_status()
-
-    return r.json()["uuid"]
 
 
 if __name__ == "__main__":
