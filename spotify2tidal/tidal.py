@@ -53,12 +53,16 @@ class Tidal:
             if playlist.name == playlist_name:
                 self._delete_playlist(playlist.id)
 
-    def _create_playlist(self, playlist_name):
+    def _create_playlist(self, playlist_name, delete_existing=False):
         """Create a tidal playlist and return its ID.
 
         Keyword arguments:
         playlist_name: Name of the playlist to create
+        delete_existing: Delete any existing playlist with the same name
         """
+        if delete_existing is True:
+            self.delete_existing_playlist(playlist_name)
+
         tidal_create_playlist_url = (
             "https://listen.tidal.com/v1/users/"
             + str(self.tidal_session.user.id)
