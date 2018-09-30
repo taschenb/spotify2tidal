@@ -57,6 +57,25 @@ class Tidal:
             if playlist.name == playlist_name:
                 self._delete_playlist(playlist.id)
 
+    def save_album(self, name, artist_name):
+        """Find an album and save it to your favorites.
+
+        Keyword arguments:
+        name: Name of the album
+        artist_name: Name of the artist
+        """
+        album = self._search_album(name, artist_name)
+
+        if album:
+            self.tidal_session.user.favorites.add_album(album)
+            logging.getLogger(__name__).warning(
+                "Added album: %s from %s", name, artist_name
+            )
+        else:
+            logging.getLogger(__name__).warning(
+                "Could not find album: %s from %s", name, artist_name
+            )
+
     def _create_playlist(self, playlist_name, delete_existing=False):
         """Create a tidal playlist and return its ID.
 
@@ -123,3 +142,16 @@ class Tidal:
         for t in tracks:
             if t.artist.name.lower() == artist.lower():
                 return t.id
+
+    def _search_album(self, name, artist):
+        """Search tidal and return the album ID.
+
+        Keyword arguments:
+        name: Name of the album
+        artist: Artist of the album
+        """
+        albums = self.tidal_session.search(field="album", value=name).albums
+
+        for a in albums:
+            if a.artist.name.lower() == artist.lower():
+                return a.id

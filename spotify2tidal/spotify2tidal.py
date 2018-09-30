@@ -30,6 +30,15 @@ class Spotify2tidal:
                 spotify_playlist=playlist, delete_existing=True
             )
 
+    def copy_all_saved_spotify_albums(self):
+        """Add all your saved albums to Tidal's favorites.
+        """
+        for album in self.spotify.saved_albums:
+            artist_name = album["album"]["artists"][0]["name"]
+            album_name = album["album"]["name"]
+
+            self.tidal.save_album(album_name, artist_name)
+
     def copy_discover_weekly(self):
         """Create a discover weekly in tidal.
         """
