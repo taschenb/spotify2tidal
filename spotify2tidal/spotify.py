@@ -41,6 +41,23 @@ class Spotify:
         return playlists
 
     @property
+    def saved_artists(self):
+        """List with all saved artists
+        """
+        try:
+            result = self.spotify_session.current_user_followed_artists()["artists"]
+            artists = result["items"]
+
+            while result["next"]:
+                result = self.spotify_session.next(result)["artists"]
+                artists.extend(result["items"])
+        except spotipy.client.SpotifyException:
+            self._refresh_expired_token()
+            return self.saved_artists
+
+        return artists
+
+    @property
     def saved_albums(self):
         """List with all saved albums.
         """
@@ -126,7 +143,7 @@ class Spotify:
         https://developer.spotify.com/documentation/general/guides/authorization-guide/
         https://spotipy.readthedocs.io/en/latest/#authorized-requests
         """
-        scope = "user-library-read playlist-read-private playlist-modify-private playlist-modify-public"
+        scope = "user-library-read playlist-read-private user-follow-read playlist-modify-private playlist-modify-public"
         token = util.prompt_for_user_token(
             self.username,
             scope=scope,

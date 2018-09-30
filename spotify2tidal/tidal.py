@@ -76,6 +76,22 @@ class Tidal:
                 "Could not find album: %s from %s", name, artist_name
             )
 
+    def save_artist(self, name):
+        """Find an artist by name and save it to your favorites.
+
+        Keyword arguments:
+        name: Name of the artist
+        """
+        artist = self._search_artist(name)
+
+        if artist:
+            self.tidal_session.user.favorites.add_artist(artist)
+            logging.getLogger(__name__).warning("Added artist: %s", name)
+        else:
+            logging.getLogger(__name__).warning(
+                "Could not find artist: %s", name
+            )
+
     def save_track(self, name, artist_name):
         """Find a track and save it to your favorites.
 
@@ -173,4 +189,16 @@ class Tidal:
 
         for a in albums:
             if a.artist.name.lower() == artist.lower():
+                return a.id
+
+    def _search_artist(self, name):
+        """Search tidal and return the artist ID.
+
+        Keyword arguments:
+        name: Name of the artist
+        """
+        artists = self.tidal_session.search(field="artist", value=name).artists
+
+        for a in artists:
+            if a.name.lower() == name.lower():
                 return a.id
