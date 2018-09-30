@@ -22,24 +22,24 @@ class Spotify2tidal:
         )
         self.tidal = Tidal(tidal_username, tidal_password)
 
-    def all_spotify_playlists_to_tidal(self):
+    def copy_all_spotify_playlists(self):
         """Create all your spotify playlists in tidal.
         """
         for playlist in self.spotify.own_playlists:
-            self._tidal_add_spotify_playlist(
+            self._add_spotify_playlist_to_tidal(
                 spotify_playlist=playlist, delete_existing=True
             )
 
-    def discover_weekly_to_tidal(self):
+    def copy_discover_weekly(self):
         """Create a discover weekly in tidal.
         """
-        self._tidal_add_spotify_playlist(
+        self._add_spotify_playlist_to_tidal(
             self.spotify.discover_weekly_playlist,
             playlist_name="Discover Weekly",
             delete_existing=True,
         )
 
-    def _tidal_add_spotify_playlist(
+    def _add_spotify_playlist_to_tidal(
         self, spotify_playlist, playlist_name=None, delete_existing=False
     ):
         """Create a tidal playlist and copy available tracks.
