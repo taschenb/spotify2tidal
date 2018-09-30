@@ -1,3 +1,4 @@
+import logging
 import spotipy
 import spotipy.util as util
 
@@ -11,14 +12,13 @@ class Spotify:
         client_redirect_uri,
         discover_weekly_id=None,
     ):
-        self.spotify_session = self._connect(
-            username, client_id, client_secret, client_redirect_uri
-        )
         self.username = username
-        self._client_id=client_id
-        self._client_secret=client_secret
-        self._redirect_uri=client_redirect_uri
+        self._client_id = client_id
+        self._client_secret = client_secret
+        self._client_redirect_uri = client_redirect_uri
         self._discover_weekly_id = discover_weekly_id
+
+        self.spotify_session = self._connect()
 
     @property
     def own_playlists(self):
@@ -113,4 +113,5 @@ class Spotify:
         To refresh the expired token, simply reauthenticate. Spotipy refreshes
         the token automatically in case it is expired.
         """
+        logging.getLogger(__name__).debug("Refreshing token")
         self.spotify_session = self._connect()

@@ -1,3 +1,4 @@
+import logging
 import requests
 import tidalapi
 
@@ -39,9 +40,12 @@ class Tidal:
                 data={"trackIds": track_id, "toIndex": 1},
             )
             r.raise_for_status()
+            logging.getLogger(__name__).info("Added: %s - %s", artist, name)
 
         else:
-            print("Could not find on tidal: " + artist + " - " + name)
+            logging.getLogger(__name__).warning(
+                "Could not find track: %s - %s", artist, name
+            )
 
     def delete_existing_playlist(self, playlist_name):
         """Delete any existing playlist with a given name.
@@ -75,6 +79,10 @@ class Tidal:
             headers={"x-tidal-sessionid": self.tidal_session.session_id},
         )
         r.raise_for_status()
+
+        logging.getLogger(__name__).debug(
+            "Created playlist: %s", playlist_name
+        )
 
         return r.json()["uuid"]
 
