@@ -76,6 +76,25 @@ class Tidal:
                 "Could not find album: %s from %s", name, artist_name
             )
 
+    def save_track(self, name, artist_name):
+        """Find a track and save it to your favorites.
+
+        Keyword arguments:
+        name: Name of the track
+        artist_name: Name of the artist
+        """
+        track = self._search_track(name, artist_name)
+
+        if track:
+            self.tidal_session.user.favorites.add_track(track)
+            logging.getLogger(__name__).warning(
+                "Added track: %s from %s", name, artist_name
+            )
+        else:
+            logging.getLogger(__name__).warning(
+                "Could not find track: %s from %s", name, artist_name
+            )
+
     def _create_playlist(self, playlist_name, delete_existing=False):
         """Create a tidal playlist and return its ID.
 

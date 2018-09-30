@@ -58,6 +58,23 @@ class Spotify:
         return albums
 
     @property
+    def saved_tracks(self):
+        """List with all saved tracks.
+        """
+        try:
+            result = self.spotify_session.current_user_saved_tracks()
+            tracks = result["items"]
+
+            while result["next"]:
+                result = self.spotify_session.next(result)
+                tracks.extend(result["items"])
+        except spotipy.client.SpotifyException:
+            self._refresh_expired_token()
+            return self.saved_tracks
+
+        return tracks
+
+    @property
     def discover_weekly_playlist(self):
         """Playlist object of the 'Discover Weekly" playlist.
 
