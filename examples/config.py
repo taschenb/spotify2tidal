@@ -1,0 +1,7 @@
+tidal_username = "username@domain.com"
+tidal_password = "password"
+spotify_username = "username"
+spotify_discover_weekly_id = "ID"
+spotify_client_id = "client_id"
+spotify_client_secret = "client_secret"
+spotify_client_redirect_uri = "https://localhost"
