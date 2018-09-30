@@ -22,6 +22,11 @@ class Spotify:
 
     @property
     def own_playlists(self):
+        """All playlists of the user.
+
+        This does not include things like 'Discover Weekly', since these are
+        technically owned by Spotify, not the user.
+        """
         try:
             result = self.spotify_session.current_user_playlists()
             playlists = result["items"]
@@ -37,6 +42,11 @@ class Spotify:
 
     @property
     def discover_weekly_playlist(self):
+        """Playlist object of the 'Discover Weekly" playlist.
+
+        Since the discover weekly is special in the sense that it isn't actually
+        owned by the user, its ID has to be manually provided beforehand.
+        """
         if not self._discover_weekly_id:
             raise ValueError("No discover weekly ID set")
 
@@ -49,6 +59,11 @@ class Spotify:
             return self.discover_weekly_playlist()
 
     def tracks_from_playlist(self, playlist):
+        """Return a list with all tracks from a given playlist.
+
+        Keyword arguments:
+        playlist: spotipy playlist to get tracks from
+        """
         try:
             result = self.spotify_session.user_playlist(
                 user=playlist["owner"]["id"],
