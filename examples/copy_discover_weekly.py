@@ -1,5 +1,5 @@
 import logging
-from spotify2tidal import Spotify2tidal
+from spotify2tidal import Spotify2Tidal
 
 import config
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     logging.getLogger("spotify2tidal").addHandler(logging.StreamHandler())
     logging.getLogger("spotify2tidal").setLevel(logging.INFO)
 
-    st = Spotify2tidal(
+    st = Spotify2Tidal(
         config.tidal_username,
         config.tidal_password,
         config.spotify_username,

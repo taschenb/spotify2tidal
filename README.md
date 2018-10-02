@@ -21,9 +21,9 @@ To get the ID, simply go to your 'Discover Weekly' playlist, click on the three 
 After obtaining all credentials, transferring content is rather simple.
 
 ```python
-from spotify2tidal import Spotify2tidal
+from spotify2tidal import Spotify2Tidal
 
-st = Spotify2tidal(
+st = Spotify2Tidal(
 	tidal_username="name",
 	tidal_password="pwd",
 	spotify_client_id="id",

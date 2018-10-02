@@ -2,7 +2,7 @@ from spotify2tidal.spotify import Spotify
 from spotify2tidal.tidal import Tidal
 
 
-class Spotify2tidal:
+class Spotify2Tidal:
     """Provide a interface for moving from Spotify to Tidal.
 
     In order to use it, you need a valid Premium-Subscription for Spotify and an
