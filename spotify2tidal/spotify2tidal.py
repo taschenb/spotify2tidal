@@ -88,12 +88,20 @@ class Spotify2tidal:
 
             self.tidal.save_track(track_name, artist_name)
 
-    def copy_discover_weekly(self):
-        """Create a discover weekly in tidal.
+    def copy_discover_weekly(self, playlist_name="Discover Weekly"):
+        """Create a discover weekly in Tidal.
+
+        To save a specific weekly playlist under a different name, use the
+        playlist_name to set to something else.
+
+        Parameters
+        ----------
+        playlist_name: str, optional
+            Name of the playlist in Tidal
         """
         self._add_spotify_playlist_to_tidal(
             self.spotify.discover_weekly_playlist,
-            playlist_name="Discover Weekly",
+            playlist_name=playlist_name,
             delete_existing=True,
         )
 
