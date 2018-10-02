@@ -4,13 +4,24 @@ import tidalapi
 
 
 class Tidal:
+    """Provide a search-based adding of new favorites to Tidal.
+
+    Add new artists/albums/tracks/albums by searching for them with
+    save_artist(), save_album(), and save_track().
+
+    Parameters
+    ----------
+    username: str
+        Tidal username
+    password: str
+        Tidal password
+    """
     def __init__(self, username, password):
         self.tidal_session = self._connect(username, password)
 
     @property
     def own_playlists(self):
-        """All playlists of the current user.
-        """
+        """All playlists of the current user."""
         return self.tidal_session.get_user_playlists(
             self.tidal_session.user.id
         )
@@ -18,10 +29,14 @@ class Tidal:
     def add_track_to_playlist(self, playlist_id, name, artist):
         """Search tidal for a track and add it to a playlist.
 
-        Keyword arguments:
-        playlist_id: Playlist to add track to
-        name: Name of the track
-        artist: Artist of the track
+        Parameters
+        ----------
+        playlist_id:
+            Playlist to add track to
+        name: str
+            Name of the track
+        artist: str
+            Artist of the track
         """
         track_id = self._search_track(name, artist)
 
@@ -50,8 +65,10 @@ class Tidal:
     def delete_existing_playlist(self, playlist_name):
         """Delete any existing playlist with a given name.
 
-        Keyword arguments:
-        playlist_name: Playlist name to delete
+        Parameters
+        ----------
+        playlist_name: str
+            Playlist name to delete
         """
         for playlist in self.own_playlists:
             if playlist.name == playlist_name:
@@ -60,9 +77,12 @@ class Tidal:
     def save_album(self, name, artist_name):
         """Find an album and save it to your favorites.
 
-        Keyword arguments:
-        name: Name of the album
-        artist_name: Name of the artist
+        Parameters
+        ----------
+        name: str
+            Name of the album
+        artist_name: str
+            Name of the artist
         """
         album = self._search_album(name, artist_name)
 
@@ -79,8 +99,10 @@ class Tidal:
     def save_artist(self, name):
         """Find an artist by name and save it to your favorites.
 
-        Keyword arguments:
-        name: Name of the artist
+        Parameters
+        ----------
+        name: str
+            Name of the artist
         """
         artist = self._search_artist(name)
 
@@ -95,9 +117,12 @@ class Tidal:
     def save_track(self, name, artist_name):
         """Find a track and save it to your favorites.
 
-        Keyword arguments:
-        name: Name of the track
-        artist_name: Name of the artist
+        Parameters
+        ----------
+        name: str
+            Name of the track
+        artist_name: str
+            Name of the artist
         """
         track = self._search_track(name, artist_name)
 
@@ -114,9 +139,12 @@ class Tidal:
     def _create_playlist(self, playlist_name, delete_existing=False):
         """Create a tidal playlist and return its ID.
 
-        Keyword arguments:
-        playlist_name: Name of the playlist to create
-        delete_existing: Delete any existing playlist with the same name
+        Parameters
+        ----------
+        playlist_name: str
+            Name of the playlist to create
+        delete_existing: str
+            Delete any existing playlist with the same name
         """
         if delete_existing is True:
             self.delete_existing_playlist(playlist_name)
@@ -143,9 +171,12 @@ class Tidal:
     def _connect(self, username, password):
         """Connect to tidal and return a session object.
 
-        Keyword arguments:
-        username: Tidal username
-        password: Tidal password
+        Parameters
+        ----------
+        username: str
+            Tidal username
+        password: str
+            Tidal password
         """
         tidal_session = tidalapi.Session()
         tidal_session.login(username, password)
@@ -154,8 +185,10 @@ class Tidal:
     def _delete_playlist(self, playlist_id):
         """Delete a playlist.
 
-        Keyword arguments:
-        playlist_id: Playlist ID to delete
+        Parameters
+        ----------
+        playlist_id: str
+            Playlist ID to delete
         """
         playlist_url = "https://listen.tidal.com/v1/playlists/" + playlist_id
 
@@ -168,9 +201,12 @@ class Tidal:
     def _search_track(self, name, artist):
         """Search tidal and return the track ID.
 
-        Keyword arguments:
-        name: Name of the track
-        artist: Artist of the track
+        Parameters
+        ----------
+        name: str
+            Name of the track
+        artist: str
+            Artist of the track
         """
         tracks = self.tidal_session.search(field="track", value=name).tracks
 
@@ -181,9 +217,12 @@ class Tidal:
     def _search_album(self, name, artist):
         """Search tidal and return the album ID.
 
-        Keyword arguments:
-        name: Name of the album
-        artist: Artist of the album
+        Parameters
+        ----------
+        name: str
+            Name of the album
+        artist: str
+            Artist of the album
         """
         albums = self.tidal_session.search(field="album", value=name).albums
 
@@ -194,8 +233,10 @@ class Tidal:
     def _search_artist(self, name):
         """Search tidal and return the artist ID.
 
-        Keyword arguments:
-        name: Name of the artist
+        Parameters
+        ----------
+        name: str
+            Name of the artist
         """
         artists = self.tidal_session.search(field="artist", value=name).artists
 

@@ -4,6 +4,21 @@ import spotipy.util as util
 
 
 class Spotify:
+    """Access a Spotify-account.
+
+    Parameters
+    ----------
+    username: str
+        Username for the Spotify-account
+    client_id: str
+        Client ID for the app, created at developer.spotify.com/dashboard
+    client_secret: str
+        Secret for the client ID, created along with the ID
+    client_redirect_uri: str
+        Link to redirect after successful authentification
+    discover_weekly_id: str, optional
+        Playlist-ID for the 'Discover Weekly' playlist provided by Spotify
+    """
     def __init__(
         self,
         username,
@@ -42,10 +57,11 @@ class Spotify:
 
     @property
     def saved_artists(self):
-        """List with all saved artists
-        """
+        """List with all saved artists."""
         try:
-            result = self.spotify_session.current_user_followed_artists()["artists"]
+            result = self.spotify_session.current_user_followed_artists()[
+                "artists"
+            ]
             artists = result["items"]
 
             while result["next"]:
@@ -59,8 +75,7 @@ class Spotify:
 
     @property
     def saved_albums(self):
-        """List with all saved albums.
-        """
+        """List with all saved albums."""
         try:
             result = self.spotify_session.current_user_saved_albums()
             albums = result["items"]
@@ -76,8 +91,7 @@ class Spotify:
 
     @property
     def saved_tracks(self):
-        """List with all saved tracks.
-        """
+        """List with all saved tracks."""
         try:
             result = self.spotify_session.current_user_saved_tracks()
             tracks = result["items"]
@@ -112,8 +126,10 @@ class Spotify:
     def tracks_from_playlist(self, playlist):
         """Return a list with all tracks from a given playlist.
 
-        Keyword arguments:
-        playlist: spotipy playlist to get tracks from
+        Parameters
+        ----------
+        playlist:
+            spotipy playlist to get tracks from
         """
         try:
             result = self.spotify_session.user_playlist(
