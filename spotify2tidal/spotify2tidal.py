@@ -82,7 +82,7 @@ class Spotify2Tidal:
 
     def copy_all_saved_spotify_tracks(self):
         """Add all your saved artists to Tidal's favorites."""
-        for track in self.spotify.saved_tracks:
+        for track in reversed(self.spotify.saved_tracks):
             artist_name = track["track"]["artists"][0]["name"]
             track_name = track["track"]["name"]
 
