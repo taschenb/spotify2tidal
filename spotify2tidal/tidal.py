@@ -1,6 +1,7 @@
 import logging
 import requests
 import tidalapi
+import webbrowser
 
 
 class Tidal:
@@ -169,17 +170,15 @@ class Tidal:
         return r.json()["uuid"]
 
     def _connect(self, username, password):
-        """Connect to tidal and return a session object.
-
-        Parameters
-        ----------
-        username: str
-            Tidal username
-        password: str
-            Tidal password
-        """
+        """Connect to tidal and return a session object."""
         tidal_session = tidalapi.Session()
-        tidal_session.login(username, password)
+        login, future = tidal_session.login_oauth()
+        print('Login with the webbrowser: ' + login.verification_uri_complete)
+        url = login.verification_uri_complete
+        if not url.startswith('https://'):
+            url = 'https://' + url
+        webbrowser.open(url)
+        future.result()
         return tidal_session
 
     def _delete_playlist(self, playlist_id):
