@@ -1,5 +1,5 @@
 import logging
-import requests
+
 import tidalapi
 
 
@@ -16,15 +16,16 @@ class Tidal:
     password: str
         Tidal password
     """
+
     def __init__(self, username, password):
-        self.tidal_session = self._connect(username, password)
+        self.tidal_session = tidalapi.Session()
+        # Will run until you visit the printed url and link your account
+        self.tidal_session.login_oauth_simple()
 
     @property
     def own_playlists(self):
         """All playlists of the current user."""
-        return self.tidal_session.get_user_playlists(
-            self.tidal_session.user.id
-        )
+        return self.tidal_session.user.playlists()
 
     def add_track_to_playlist(self, playlist_id, name, artist):
         """Search tidal for a track and add it to a playlist.
@@ -41,21 +42,8 @@ class Tidal:
         track_id = self._search_track(name, artist)
 
         if track_id:
-            tidal_add_track_url = (
-                "https://listen.tidal.com/v1/playlists/"
-                + str(playlist_id)
-                + "/items"
-            )
-            r = requests.post(
-                tidal_add_track_url,
-                headers={
-                    "x-tidal-sessionid": self.tidal_session.session_id,
-                    "if-none-match": "*",
-                },
-                data={"trackIds": track_id, "toIndex": 1},
-            )
-            r.raise_for_status()
-            logging.getLogger(__name__).info("Added: %s - %s", artist, name)
+            playlist = self.tidal_session.playlist(playlist_id)
+            playlist.add([track_id])
 
         else:
             logging.getLogger(__name__).warning(
@@ -149,24 +137,13 @@ class Tidal:
         if delete_existing is True:
             self.delete_existing_playlist(playlist_name)
 
-        tidal_create_playlist_url = (
-            "https://listen.tidal.com/v1/users/"
-            + str(self.tidal_session.user.id)
-            + "/playlists"
-        )
-
-        r = requests.post(
-            tidal_create_playlist_url,
-            data={"title": playlist_name, "description": ""},
-            headers={"x-tidal-sessionid": self.tidal_session.session_id},
-        )
-        r.raise_for_status()
+        playlist = self.tidal_session.user.create_playlist(playlist_name, "Created by spotify2tidal")
 
         logging.getLogger(__name__).debug(
             "Created playlist: %s", playlist_name
         )
 
-        return r.json()["uuid"]
+        return playlist.id
 
     def _connect(self, username, password):
         """Connect to tidal and return a session object.
@@ -190,13 +167,8 @@ class Tidal:
         playlist_id: str
             Playlist ID to delete
         """
-        playlist_url = "https://listen.tidal.com/v1/playlists/" + playlist_id
-
-        r = requests.delete(
-            playlist_url,
-            headers={"x-tidal-sessionid": self.tidal_session.session_id},
-        )
-        r.raise_for_status()
+        playlist = self.tidal_session.playlist(playlist_id)
+        playlist.delete()
 
     def _search_track(self, name, artist):
         """Search tidal and return the track ID.
@@ -208,7 +180,7 @@ class Tidal:
         artist: str
             Artist of the track
         """
-        tracks = self.tidal_session.search(field="track", value=name).tracks
+        tracks = self.tidal_session.search(models=[tidalapi.Track], query=name)["tracks"]
 
         for t in tracks:
             if t.artist.name.lower() == artist.lower():
