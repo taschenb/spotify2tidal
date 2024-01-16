@@ -47,7 +47,7 @@ class Spotify:
             playlists = result["items"]
 
             while result["next"]:
-                result = self.spotify_sesion.next(result)
+                result = self.spotify_session.next(result)
                 playlists.extend(result["items"])
         except spotipy.client.SpotifyException:
             self._refresh_expired_token()
@@ -132,11 +132,7 @@ class Spotify:
             spotipy playlist to get tracks from
         """
         try:
-            result = self.spotify_session.user_playlist(
-                user=playlist["owner"]["id"],
-                playlist_id=playlist["id"],
-                fields="tracks,next",
-            )["tracks"]
+            result = self.spotify_session.playlist(playlist["id"])["tracks"]
 
             tracks = result["items"]
 
