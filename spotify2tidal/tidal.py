@@ -17,7 +17,7 @@ class Tidal:
         Tidal password
     """
 
-    def __init__(self, username, password):
+    def __init__(self):
         self.tidal_session = tidalapi.Session()
         # Will run until you visit the printed url and link your account
         self.tidal_session.login_oauth_simple()
