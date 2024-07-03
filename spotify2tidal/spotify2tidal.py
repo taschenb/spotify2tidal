@@ -1,3 +1,5 @@
+import logging
+
 from spotify2tidal.spotify import Spotify
 from spotify2tidal.tidal import Tidal
 
@@ -5,10 +7,8 @@ from spotify2tidal.tidal import Tidal
 class Spotify2Tidal:
     """Provide a interface for moving from Spotify to Tidal.
 
-    In order to use it, you need a valid Premium-Subscription for Spotify and an
-    account at Tidal.
-    While Tidal requires just a username and password, Spotify requires some
-    work to register a third-party application to access ones account.
+    In order to use it, you need an account at Tidal and Spotify.
+    Spotify requires some work to register a third-party application to access ones account.
 
     A valid client ID and client secret need to be created and a redirection
     link needs to be whitelisted.
@@ -26,10 +26,6 @@ class Spotify2Tidal:
 
     Parameters
     ----------
-    tidal_username: str
-        Username for the Tidal-account
-    tidal_password: str
-        Password for the Tidal-account
     spotify_username: str
         Username for the Spotfiy-account
     spotify_client_id: str
@@ -43,8 +39,6 @@ class Spotify2Tidal:
     """
     def __init__(
         self,
-        tidal_username,
-        tidal_password,
         spotify_username,
         spotify_client_id,
         spotify_client_secret,
@@ -58,7 +52,23 @@ class Spotify2Tidal:
             spotify_redirect_uri,
             spotify_discover_weekly_id,
         )
-        self.tidal = Tidal(tidal_username, tidal_password)
+        self.tidal = Tidal()
+
+    def copy_selected_spotify_playlists(self):
+        """Ask for every spotify playlist whether to copy it or not."""
+        for playlist in self.spotify.own_playlists:
+            answer = input("Copy playlist {} (y)/(n)? ".format(playlist["name"]))
+            if answer != "y" and answer != "n":
+                print("Invalid answer - should be y or n")
+                answer = input("Copy playlist {} (y)/(n)? ".format(playlist["name"]))
+            if answer == "n":
+                continue
+            self._add_spotify_playlist_to_tidal(
+                spotify_playlist=playlist, delete_existing=True
+            )
+            logging.getLogger(__name__).debug(
+                "---------"
+            )
 
     def copy_all_spotify_playlists(self):
         """Create all your spotify playlists in tidal."""
@@ -129,9 +139,12 @@ class Spotify2Tidal:
         )
 
         for track in spotify_tracks:
-            artist = track["track"]["artists"][0]["name"]
-            # album = track["track"]["album"]["name"]
-            name = track["track"]["name"]
+            if track["track"] != None:
+                artist = track["track"]["artists"][0]["name"]
+                # album = track["track"]["album"]["name"]
+                name = track["track"]["name"]
+            else:
+                logging.warning(track)
             self.tidal.add_track_to_playlist(
                 tidal_playlist_id, artist=artist, name=name
             )

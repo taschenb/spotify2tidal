@@ -15,11 +15,9 @@ if __name__ == "__main__":
     """
     # Enable logging to see what is going on
     logging.getLogger("spotify2tidal").addHandler(logging.StreamHandler())
-    logging.getLogger("spotify2tidal").setLevel(logging.INFO)
+    logging.getLogger("spotify2tidal").setLevel(logging.DEBUG)
 
     st = Spotify2Tidal(
-        config.tidal_username,
-        config.tidal_password,
         config.spotify_username,
         config.spotify_client_id,
         config.spotify_client_secret,

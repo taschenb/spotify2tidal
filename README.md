@@ -24,8 +24,6 @@ After obtaining all credentials, transferring content is rather simple.
 from spotify2tidal import Spotify2Tidal
 
 st = Spotify2Tidal(
-	tidal_username="name",
-	tidal_password="pwd",
 	spotify_client_id="id",
 	spotify_client_secret="sec",
 	spotify_redirect_uri="uri",

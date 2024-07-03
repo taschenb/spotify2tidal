@@ -19,8 +19,6 @@ if __name__ == "__main__":
     logging.getLogger("spotify2tidal").setLevel(logging.INFO)
 
     st = Spotify2Tidal(
-        config.tidal_username,
-        config.tidal_password,
         config.spotify_username,
         config.spotify_client_id,
         config.spotify_client_secret,
